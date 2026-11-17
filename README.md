@@ -14,7 +14,7 @@ brew install --cask valeriinov/tap/macdictation
 Or download `MacDictation-<version>.zip` from the latest release, unzip it and move
 `MacDictation.app` to Applications.
 
-The app checks for updates itself. Homebrew users can also run `brew upgrade`.
+The app checks for updates itself. Homebrew users can also run `brew upgrade --cask --greedy macdictation`.
 
 ## Guide
 
