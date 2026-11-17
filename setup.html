@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MacDictation guide</title>
+<style>
+:root {
+  --brand: #0F766E; --brand-strong: #0F766E; --brand-soft: #E3F4F1; --brand-line: #BFE3DD; --brand-bg2: #F1FAF8;
+  --ground: #F7F6F3; --surface: #FFFFFF; --line: #E7E4DE; --track: #EDEBE6;
+  --ink: #1C1A17; --muted: #6B665E; --code-bg: #EDEBE6;
+  --ok-soft: #E8F5EC; --ok-ink: #2F8F4E; --warn-soft: #FEF3E2; --warn-ink: #8A4A0B;
+  --app: #45413B; --app-soft: #EDEBE6; --app-line: #D9D5CD; --app-bg: #FAF9F7;
+  --shadow: 0 1px 3px rgba(28,26,23,.06), 0 10px 28px -18px rgba(28,26,23,.25);
+  --font-display: system-ui, -apple-system, Roboto, "Segoe UI", sans-serif;
+  --font-body: system-ui, -apple-system, Roboto, "Segoe UI", sans-serif;
+  --font-mono: Menlo, ui-monospace, "SF Mono", monospace;
+  color-scheme: light;
+}
+html[lang="en"] [data-l="uk"], html[lang="uk"] [data-l="en"] { display: none !important; }
+* { box-sizing: border-box; }
+body { background: var(--ground); color: var(--ink); font: 15px/1.55 var(--font-body); margin: 0;
+  padding: 0 max(16px, env(safe-area-inset-right, 0px)) 56px max(16px, env(safe-area-inset-left, 0px)); }
+.wrap { max-width: 760px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+header { padding-top: 28px; display: grid; gap: 14px; }
+.brand-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.brand-row > div:not(.lang) { flex: 1 1 240px; min-width: 0; }
+.logo { width: 38px; height: 38px; flex: none; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font: 700 14px/1 var(--font-body); }
+.eyebrow { font: 700 11px/1.2 var(--font-body); letter-spacing: .08em; text-transform: uppercase; color: var(--brand); margin: 0 0 4px; }
+h1 { font: 700 22px/1.25 var(--font-display); margin: 0; letter-spacing: -.01em; overflow-wrap: anywhere; }
+h2 { font: 700 18px/1.3 var(--font-body); margin: 0; }
+h3 { font: 700 15px/1.3 var(--font-body); margin: 0; }
+p { margin: 0; }
+.sub { color: var(--muted); font-size: 14px; max-width: 64ch; }
+.lang { display: flex; gap: 2px; padding: 3px; background: var(--track); border-radius: 10px; flex: none; align-self: start; }
+.lang button { font: 700 12px/1 var(--font-body); border: 0; background: transparent; color: var(--muted); padding: 7px 10px; border-radius: 8px; cursor: pointer; }
+.lang button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(28,26,23,.12); }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; background: var(--track); border-radius: 12px; justify-self: start; max-width: 100%; }
+.tabs button { font: 700 14px/1 var(--font-body); border: 0; background: transparent; color: var(--muted); padding: 9px 14px; border-radius: 9px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(28,26,23,.12); }
+.panel { display: grid; gap: 22px; grid-template-columns: minmax(0, 1fr); }
+.panel[hidden] { display: none; }
+section { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+.stage-head { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+.stage-head .k { font: 500 12px/1 var(--font-mono); color: var(--muted); }
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: s; }
+.step, .box { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow); }
+.step { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 4px 12px; }
+.step::before { counter-increment: s; content: counter(s); width: 28px; height: 28px; border-radius: 50%; background: var(--brand-soft); color: var(--brand-strong); display: grid; place-items: center; font: 700 13px/1 var(--font-body); }
+.body, .box { min-width: 0; display: grid; gap: 8px; align-content: start; }
+.body { padding-top: 3px; }
+.t { font-weight: 700; }
+ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+a { color: var(--brand); text-underline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+code, kbd { font-family: var(--font-mono); font-size: .86em; background: var(--code-bg); padding: 1px 5px; border-radius: 6px; overflow-wrap: anywhere; }
+.cmd { position: relative; min-width: 0; }
+.cmd code { display: block; font-size: 13px; padding: 9px 84px 9px 12px; border-radius: 10px; }
+.cmd .copy { position: absolute; top: 50%; right: 6px; transform: translateY(-50%); }
+.route { display: grid; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.route:first-of-type { padding-top: 4px; border-top: 0; }
+.code { position: relative; min-width: 0; }
+.code .copy { position: absolute; top: 8px; right: 8px; }
+pre { margin: 0; background: var(--code-bg); border-radius: 12px; padding: 12px 14px; padding-right: 96px; overflow-x: auto; font: 500 12.5px/1.6 var(--font-mono); }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+button.copy { font: 700 13px/1 var(--font-body); padding: 7px 11px; border-radius: 10px; border: 1px solid var(--brand-line); background: var(--surface); color: var(--brand); cursor: pointer; }
+button.copy:hover { background: var(--brand-bg2); }
+button.link { font: inherit; color: var(--brand); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.cards.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.card ol { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.tag { font: 700 12px/1 var(--font-body); padding: 5px 9px; border-radius: 999px; justify-self: start; background: var(--brand-soft); color: var(--brand-strong); white-space: nowrap; }
+.tag.ok { background: var(--ok-soft); color: var(--ok-ink); }
+.tag.app { background: var(--app-soft); color: var(--app); }
+.tag.warn { background: var(--warn-soft); color: var(--warn-ink); }
+.callout { padding: 10px 14px; border-radius: 12px; background: var(--brand-soft); font-size: 14px; }
+.callout b { color: var(--brand-strong); }
+.callout.ok { background: var(--ok-soft); }
+.callout.ok b { color: var(--ok-ink); }
+.callout.warn { background: var(--warn-soft); }
+.callout.warn b { color: var(--warn-ink); }
+.small { font-size: 13.5px; color: var(--muted); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+td { padding: 7px 0; border-top: 1px solid var(--line); vertical-align: top; }
+td:first-child { padding-right: 14px; width: 34%; }
+tr:first-child td { border-top: 0; }
+.flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.flow > div { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 10px; display: grid; gap: 4px; align-content: start; box-shadow: var(--shadow); }
+.flow b { font-size: 14px; }
+.flow span { font-size: 12.5px; color: var(--muted); }
+.flow .n { font: 700 12px/1 var(--font-mono); color: var(--brand); }
+.flow .app { border-color: var(--app-line); background: var(--app-bg); }
+.flow .app .n { color: var(--app); }
+.arch { display: grid; grid-template-columns: minmax(0, 1fr) 92px minmax(0, 1fr); gap: 8px; align-items: stretch; }
+.side { border-radius: 16px; padding: 12px; display: grid; gap: 8px; align-content: start; border: 1px dashed var(--brand-line); background: var(--brand-bg2); }
+.side.app { border-color: var(--app-line); background: var(--app-bg); }
+.side .h { font: 700 12px/1.2 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--brand); }
+.side.app .h { color: var(--app); }
+.node { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; font-size: 13px; display: grid; gap: 2px; }
+.node code { font-size: 11.5px; justify-self: start; }
+.wire { display: grid; place-items: center; text-align: center; font-size: 12px; color: var(--muted); gap: 4px; align-content: center; }
+.wire .arrow { font-size: 22px; color: var(--brand); line-height: 1; }
+.phrase { font-style: italic; color: var(--ink); }
+.explain { display: grid; gap: 8px; font-size: 14px; }
+.explain summary { font: 700 12px/1.2 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--brand); cursor: pointer; justify-self: start; list-style: none; display: flex; gap: 6px; align-items: center; padding: 4px 0; }
+.explain summary::-webkit-details-marker { display: none; }
+.explain summary::before { content: "▸"; transition: transform .15s; }
+.explain[open] summary::before { transform: rotate(90deg); }
+.explain ul { list-style: none; padding: 0; gap: 6px; }
+.explain li { padding-left: 12px; border-left: 3px solid var(--brand-line); display: grid; gap: 2px; }
+.explain li > code:first-child { justify-self: start; }
+@media (max-width: 640px) {
+  .flow, .cards.two { grid-template-columns: minmax(0, 1fr); }
+  .arch { grid-template-columns: minmax(0, 1fr); }
+  .wire .arrow { transform: rotate(90deg); }
+  td:first-child { width: 40%; }
+}
+@media (max-width: 560px), (pointer: coarse) { button.copy { min-height: 40px; } }
+kbd { border: 1px solid var(--line); }
+.ui { background: #1C1C1E; color: #fff; border-radius: 14px; padding: 12px; display: grid; gap: 8px; font-size: 12px; }
+.ui .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ui .mic { width: 30px; height: 30px; border-radius: 50%; background: #0A84FF; display: grid; place-items: center; }
+.ui .btn { border: 1px solid rgba(255,255,255,.2); border-radius: 7px; padding: 4px 9px; }
+.ui .btn.w { background: #fff; color: #1C1C1E; border-color: #fff; font-weight: 700; }
+.ui .chip { border: 1px solid rgba(255,255,255,.2); border-radius: 7px; padding: 3px 8px; }
+.ui .chip.on { background: #0A84FF; border-color: #0A84FF; }
+.ui .txt { background: rgba(255,255,255,.07); border-radius: 8px; padding: 7px 8px; display: grid; gap: 3px; }
+.ui .lab { color: rgba(255,255,255,.55); font-size: 10.5px; font-weight: 700; display: flex; gap: 8px; align-items: center; }
+.ui .lab i { flex: 1; font-style: normal; }
+.ui .mini { border-radius: 5px; padding: 1px 7px; background: rgba(255,255,255,.15); color: #fff; font-style: normal; }
+.ui .mini.w { background: #fff; color: #1C1C1E; }
+.pin { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--brand); color: #fff; font: 700 11px/1 var(--font-body); flex: none; }
+.legend td:first-child { width: auto; white-space: nowrap; }
+.card .cmd { margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand-row">
+      <span class="logo" aria-hidden="true">🎙</span>
+      <div>
+        <p class="eyebrow"><span data-l="en">MacDictation · Guide</span><span data-l="uk">MacDictation · Посібник</span></p>
+        <h1>MacDictation</h1>
+      </div>
+      <div class="lang" role="group" aria-label="Language / Мова">
+        <button type="button" data-set-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-set-lang="uk" aria-pressed="false">UK</button>
+      </div>
+    </div>
+    <p class="sub">
+      <span data-l="en">You speak, and MacDictation types the text where your cursor is. The speech recognition works on your Mac. An AI service can then fix the text or rewrite it in a style.</span>
+      <span data-l="uk">Ви говорите, а MacDictation друкує текст там, де стоїть курсор. Розпізнавання мовлення працює на вашому Mac. Потім сервіс ШІ може виправити текст або переписати його в потрібному стилі.</span>
+    </p>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-how" aria-controls="how" aria-selected="true"><span data-l="en">How it works</span><span data-l="uk">Як це працює</span></button>
+      <button role="tab" id="tab-install" aria-controls="install" aria-selected="false" tabindex="-1"><span data-l="en">Install</span><span data-l="uk">Встановлення</span></button>
+    </div>
+  </header>
+
+  <!-- ============================== HOW IT WORKS ============================== -->
+  <div class="panel" id="how" role="tabpanel" aria-labelledby="tab-how">
+    <section>
+      <div class="stage-head"><h2><span data-l="en">The path of a dictation</span><span data-l="uk">Шлях диктовки</span></h2></div>
+      <div class="flow">
+        <div><span class="n">1</span><b><span data-l="en">You speak</span><span data-l="uk">Ви говорите</span></b><span><span data-l="en">Hold the hotkey, or open the window.</span><span data-l="uk">Утримуйте гарячу клавішу або відкрийте вікно.</span></span></div>
+        <div><span class="n">2</span><b><span data-l="en">Recognition</span><span data-l="uk">Розпізнавання</span></b><span><span data-l="en">On your Mac. No internet.</span><span data-l="uk">На вашому Mac. Без інтернету.</span></span></div>
+        <div class="app"><span class="n"><span data-l="en">3 · Cleanup only</span><span data-l="uk">3 · лише Чистка</span></span><b><span data-l="en">Jev check</span><span data-l="uk">Перевірка Jev</span></b><span><span data-l="en">Does the text have errors? Under 2 s.</span><span data-l="uk">Чи є в тексті помилки? До 2 с.</span></span></div>
+        <div><span class="n">4</span><b><span data-l="en">AI edit</span><span data-l="uk">Правка ШІ</span></b><span><span data-l="en">Your service fixes or rewrites the text.</span><span data-l="uk">Ваш сервіс виправляє або переписує текст.</span></span></div>
+        <div><span class="n">5</span><b><span data-l="en">Paste</span><span data-l="uk">Вставка</span></b><span><span data-l="en">The text goes to your cursor.</span><span data-l="uk">Текст з’являється біля курсора.</span></span></div>
+      </div>
+      <p class="small">
+        <span data-l="en">Mode <b>0 No edit</b> skips steps 3 and 4. Your own modes skip step 3: they always rewrite the text. Without a connected AI service, every mode skips step 4, see <b>What works without AI</b> below.</span>
+        <span data-l="uk">Режим <b>0 Без правки</b> пропускає кроки 3 і 4. Ваші власні режими пропускають крок 3: вони завжди переписують текст. Без підключеного сервісу ШІ кожен режим пропускає крок 4, див. <b>Що працює без ШІ</b> нижче.</span>
+      </p>
+    </section>
+
+    <section>
+      <div class="stage-head"><h2><span data-l="en">Two ways to dictate</span><span data-l="uk">Два способи диктувати</span></h2></div>
+      <div class="cards two">
+        <div class="box">
+          <span class="tag"><span data-l="en">Quick</span><span data-l="uk">Швидко</span> · <kbd>⌃⇧Space</kbd></span>
+          <ul>
+            <li><span data-l="en"><b>Hold</b> the keys, speak, let go. The app pastes the text.</span><span data-l="uk"><b>Утримуйте</b> клавіші, говоріть, відпустіть. Застосунок вставить текст.</span></li>
+            <li><span data-l="en"><b>Tap</b> the keys to start, tap again to stop and paste.</span><span data-l="uk"><b>Натисніть</b> клавіші, щоб почати, і ще раз, щоб зупинити й вставити.</span></li>
+            <li><span data-l="en">The mode is always <b>1 Cleanup</b>. There is no review step.</span><span data-l="uk">Режим завжди <b>1 Чистка</b>. Кроку перевірки немає.</span></li>
+          </ul>
+        </div>
+        <div class="box">
+          <span class="tag"><span data-l="en">With a style</span><span data-l="uk">Зі стилем</span> · <kbd>⌃Space</kbd></span>
+          <ul>
+            <li><span data-l="en">The window opens. Press a digit to pick a mode. The recording starts.</span><span data-l="uk">Відкривається вікно. Натисніть цифру, щоб вибрати режим. Запис починається.</span></li>
+            <li><span data-l="en">Speak, then press <kbd>Return</kbd>. The app shows the text before and after the edit.</span><span data-l="uk">Говоріть, потім натисніть <kbd>Return</kbd>. Застосунок покаже текст до і після правки.</span></li>
+            <li><span data-l="en">Press <kbd>Return</kbd> again to paste. Press <kbd>Esc</kbd> to cancel.</span><span data-l="uk">Натисніть <kbd>Return</kbd> ще раз, щоб вставити. <kbd>Esc</kbd> скасовує.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="stage-head"><h2><span data-l="en">The window</span><span data-l="uk">Вікно</span></h2></div>
+      <div class="ui" aria-label="The MacDictation window">
+        <div class="row"><span class="pin">1</span><span class="mic">🎙</span><span class="pin">2</span><span style="opacity:.6">▮▮▯▮▮ 0:07</span><span style="flex:1"></span><span class="pin">3</span><span class="btn"><span data-l="en">Cancel</span><span data-l="uk">Скасувати</span> Esc</span><span class="btn w"><span data-l="en">Done</span><span data-l="uk">Готово</span> ↩</span></div>
+        <div class="row"><span class="pin">4</span><span class="chip on">1 <span data-l="en">Cleanup</span><span data-l="uk">Чистка</span></span><span class="chip">0 <span data-l="en">No edit</span><span data-l="uk">Без правки</span></span><span class="chip">2 <span data-l="en">Coherent text</span><span data-l="uk">Зв’язний текст</span></span><span class="chip">3 <span data-l="en">Business</span><span data-l="uk">Діловий</span></span><span class="chip">…</span></div>
+        <div style="height:1px;background:rgba(255,255,255,.18)"></div>
+        <div class="row"><span class="pin">5</span><span class="chip">🎙 <span data-l="en">Auto</span><span data-l="uk">Авто</span> ▾</span><span style="opacity:.6">→</span><span class="chip">EN</span><span class="chip on">UK</span><span style="opacity:.3">|</span><span class="chip">DE</span><span class="chip">PL</span><span class="chip" style="opacity:.75">+2 ▾</span></div>
+        <div class="row"><span class="pin">6</span><div class="txt" style="flex:1"><span class="lab"><i><span data-l="en">Original</span><span data-l="uk">Оригінал</span></i>⧉ <svg class="eraser" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M9.5 2.5l4 4-6 6H4.5l-2-2z M6 6l4 4 M4.5 12.5H14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> <span class="mini"><span data-l="en">Insert</span><span data-l="uk">Вставити</span></span></span>привіт світ як справи</div></div>
+        <div class="row"><span class="pin">7</span><div class="txt" style="flex:1"><span class="lab"><i><span data-l="en">Edited</span><span data-l="uk">Після правки</span></i>⧉ <svg class="eraser" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M9.5 2.5l4 4-6 6H4.5l-2-2z M6 6l4 4 M4.5 12.5H14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> <span class="mini w"><span data-l="en">Insert</span><span data-l="uk">Вставити</span> ↩</span></span>Привіт, світе! Як справи?</div></div>
+        <div class="row"><span class="pin">8</span><span style="opacity:.6"><span data-l="en">AI modes and translation need an AI service</span><span data-l="uk">Режими й переклад потребують сервісу ШІ</span></span><span class="btn"><span data-l="en">Connect</span><span data-l="uk">Підключити</span></span></div>
+      </div>
+      <div class="box">
+        <table class="legend">
+          <tr><td><span class="pin">1</span> <span data-l="en">Microphone</span><span data-l="uk">Мікрофон</span></td><td><span data-l="en">Starts a recording. During a recording, it pauses it without the edit.</span><span data-l="uk">Починає запис. Під час запису ставить його на паузу без правки.</span></td></tr>
+          <tr><td><span class="pin">2</span> <span data-l="en">Level and time</span><span data-l="uk">Рівень і час</span></td><td><span data-l="en">Shows that the app hears you, and how long the recording is.</span><span data-l="uk">Показує, що застосунок вас чує, і скільки триває запис.</span></td></tr>
+          <tr><td><span class="pin">3</span> <span data-l="en">Main buttons</span><span data-l="uk">Головні кнопки</span></td><td>
+            <span data-l="en"><b>Cancel</b> stops and pastes nothing. <b>Done</b> stops the recording and runs the edit. <b>Apply</b> edits the text again after a change of the mode, the language or the original text. The top bar shows a button only when it can act: while the app recognises, checks or edits the text, it holds only <b>Cancel</b>. After the paste, <b>Close</b> hides the window and <b>↶ Original</b> puts back the text before the edit.</span>
+            <span data-l="uk"><b>Скасувати</b> зупиняє запис і нічого не вставляє. <b>Готово</b> зупиняє запис і запускає правку. <b>Застосувати</b> знову редагує текст після зміни режиму, мови чи оригіналу. Верхня панель показує кнопку, лише коли вона може діяти: поки застосунок розпізнає, перевіряє або редагує текст, там є тільки <b>Скасувати</b>. Після вставки <b>Закрити</b> ховає вікно, а <b>↶ Оригінал</b> повертає текст до правки.</span>
+          </td></tr>
+          <tr><td><span class="pin">4</span> <span data-l="en">Modes</span><span data-l="uk">Режими</span></td><td>
+            <span data-l="en">The style of the edit. Digits <kbd>0</kbd>–<kbd>9</kbd> pick a mode, and they start the recording when the window has just opened; a click only picks a mode. The chips wrap to the next row when they do not fit. Without a connected AI service, the chips of Cleanup and of your own modes are dimmed and show a lock, and <b>0 No edit</b> shows as selected. Before the recording starts, a click or a digit on a locked mode closes the window and opens Settings; later it does nothing.</span>
+            <span data-l="uk">Стиль правки. Цифри <kbd>0</kbd>–<kbd>9</kbd> вибирають режим і починають запис, якщо вікно щойно відкрилося; клік лише вибирає режим. Кнопки режимів переносяться в наступний ряд, коли не вміщаються. Без підключеного сервісу ШІ кнопки Чистки та ваших власних режимів тьмяні із замком, а <b>0 Без правки</b> показано як вибраний. До початку запису клік або цифра на заблокованому режимі закриває вікно й відкриває Налаштування; пізніше вони нічого не роблять.</span>
+          </td></tr>
+          <tr><td><span class="pin">5</span> <span data-l="en">Language</span><span data-l="uk">Мова</span></td><td>
+            <span data-l="en">The language of the result. The current keyboard layout selects it. A click selects another one until you change the layout. Languages you add in Settings → <b>General</b> → <b>Languages</b> come after a line; <b>+N</b> lists the rest. Without a connected AI service, these chips are dimmed and show a lock; a click closes the window and opens Settings. With a Whisper speech model, the first chip, a microphone with <b>Auto</b>, sets the language of the speech. It opens a row under the language row with <b>Auto</b> and the same languages; a pick closes the row. An arrow after the chip points to the result language: with <b>Auto</b> → <b>UK</b>, the model detects the language of the speech, and the AI edit writes the text in Ukrainian. The keyboard layout does not change the speech language. It stays <b>Auto</b>, where the model detects the language, until you pick one. The chip works without an AI service. Parakeet models have no such chip.</span>
+            <span data-l="uk">Мова результату. Її вибирає поточна розкладка клавіатури. Клік вибирає іншу, доки ви не зміните розкладку. Мови, які ви додали в Налаштуваннях → <b>Загальні</b> → <b>Мови</b>, стоять після риски; <b>+N</b> показує решту. Без підключеного сервісу ШІ ці кнопки тьмяні із замком; клік закриває вікно й відкриває Налаштування. З моделлю Whisper перша кнопка, мікрофон з <b>Авто</b>, задає мову мовлення. Вона відкриває під рядком мов ряд з <b>Авто</b> і тими самими мовами; вибір закриває ряд. Стрілка після кнопки веде до мови результату: з <b>Авто</b> → <b>UK</b> модель сама визначає мову мовлення, а правка ШІ пише текст українською. Розкладка клавіатури не змінює мову мовлення. Вона лишається <b>Авто</b>, коли модель сама визначає мову, доки ви не виберете іншу. Кнопка працює без сервісу ШІ. У моделей Parakeet такої кнопки немає.</span>
+          </td></tr>
+          <tr><td><span class="pin">6</span> <span data-l="en">Original</span><span data-l="uk">Оригінал</span></td><td>
+            <span data-l="en">What the app heard. Click in it to change the text. <b>⧉</b> copies the text. The eraser <svg class="eraser" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M9.5 2.5l4 4-6 6H4.5l-2-2z M6 6l4 4 M4.5 12.5H14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> clears the original and the edited text, also during a recording: the recording goes on into the empty field. While the app recognises, checks or edits the text, the eraser is dimmed and does nothing. <b>Restore</b> then puts the texts back. It stays until a new text appears or the dictation goes to its next step, for example <b>Done</b> or a new recording. After a click in a text, <kbd>⌘K</kbd> does the same as the eraser.</span>
+            <span data-l="uk">Те, що почув застосунок. Клацніть у нього, щоб змінити текст. <b>⧉</b> копіює текст. Гумка <svg class="eraser" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M9.5 2.5l4 4-6 6H4.5l-2-2z M6 6l4 4 M4.5 12.5H14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> очищає оригінал і текст після правки, також під час запису: запис іде далі в порожнє поле. Поки застосунок розпізнає, перевіряє або редагує текст, гумка тьмяна і нічого не робить. Потім <b>Повернути</b> повертає тексти. Посилання є, доки не з’явиться новий текст або диктовка не перейде до наступного кроку, наприклад <b>Готово</b> чи нового запису. Після кліку в тексті <kbd>⌘K</kbd> робить те саме, що гумка.</span>
+          </td></tr>
+          <tr><td><span class="pin">7</span> <span data-l="en">Edited</span><span data-l="uk">Після правки</span></td><td>
+            <span data-l="en">The AI result. <b>⧉</b> copies the text. The eraser <svg class="eraser" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M9.5 2.5l4 4-6 6H4.5l-2-2z M6 6l4 4 M4.5 12.5H14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> clears only this text, and the original stays. Type your own text into the empty field, or press <b>Restore</b> to put the AI result back. <b>Insert</b> pastes the text at the cursor; the white button is the one <kbd>Return</kbd> presses. With an empty field, <b>Insert</b> hides, and <kbd>Return</kbd> pastes nothing. When the edit fails, a red line shows the reason, and the same line shows in the menu bar menu under the state. The original text stays.</span>
+            <span data-l="uk">Результат ШІ. <b>⧉</b> копіює текст. Гумка <svg class="eraser" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M9.5 2.5l4 4-6 6H4.5l-2-2z M6 6l4 4 M4.5 12.5H14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> очищає лише цей текст, а оригінал лишається. Напишіть свій текст у порожнє поле або натисніть <b>Повернути</b>, щоб повернути результат ШІ. <b>Вставити</b> вставляє текст біля курсора; біла кнопка — та, яку натискає <kbd>Return</kbd>. З порожнім полем <b>Вставити</b> зникає, а <kbd>Return</kbd> нічого не вставляє. Якщо правка не вдалася, червоний рядок показує причину, і той самий рядок з’являється в меню в рядку меню під станом. Оригінал залишається.</span>
+          </td></tr>
+          <tr><td><span class="pin">8</span> <span data-l="en">Bottom line</span><span data-l="uk">Нижній рядок</span></td><td>
+            <span data-l="en">Shows only when no AI service is connected: <b>AI modes and translation need an AI service</b> and the <b>Connect</b> button. <b>Connect</b> closes the window, cancels a running dictation and opens Settings.</span>
+            <span data-l="uk">З’являється, лише коли сервіс ШІ не підключено: <b>Режими й переклад потребують сервісу ШІ</b> і кнопка <b>Підключити</b>. <b>Підключити</b> закриває вікно, скасовує диктовку, що йде, і відкриває Налаштування.</span>
+          </td></tr>
+        </table>
+      </div>
+      <ul class="small">
+        <li><span data-l="en">Need a translation? Add the language in Settings → <b>General</b> → <b>Languages</b>. Speak in your usual language, select the added one, and the edit translates the text. This needs a connected AI service.</span><span data-l="uk">Потрібен переклад? Додайте мову в Налаштуваннях → <b>Загальні</b> → <b>Мови</b>. Говоріть своєю звичною мовою, виберіть додану, і правка перекладе текст. Для цього потрібен підключений сервіс ШІ.</span></li>
+        <li><span data-l="en">Drag the window by its background to move it.</span><span data-l="uk">Щоб пересунути вікно, тягніть його за фон.</span></li>
+        <li><span data-l="en">Wrong mode or language? Click the right one, also after the paste. <b>Apply</b> appears and edits the original again. You check the new text before it is pasted.</span><span data-l="uk">Не той режим чи мова? Клацніть потрібні, навіть після вставки. З’явиться <b>Застосувати</b> і знову відредагує оригінал. Ви перевіряєте новий текст перед вставкою.</span></li>
+        <li><span data-l="en">The microphone after the edit adds the next dictation at the cursor in the original.</span><span data-l="uk">Мікрофон після правки додає наступну диктовку в оригінал там, де стоїть курсор.</span></li>
+      </ul>
+    </section>
+
+    <section>
+      <div class="stage-head"><h2><span data-l="en">Modes</span><span data-l="uk">Режими</span></h2></div>
+      <div class="box">
+        <table>
+          <tr><td><kbd>1</kbd> <span data-l="en">Cleanup</span><span data-l="uk">Чистка</span></td><td><span data-l="en">Fixes recognition errors and punctuation. Keeps your words.</span><span data-l="uk">Виправляє помилки розпізнавання і пунктуацію. Зберігає ваші слова.</span></td></tr>
+          <tr><td><kbd>0</kbd> <span data-l="en">No edit</span><span data-l="uk">Без правки</span></td><td><span data-l="en">Pastes the text as the app heard it.</span><span data-l="uk">Вставляє текст так, як його почув застосунок.</span></td></tr>
+          <tr><td><kbd>2</kbd> <span data-l="en">Coherent text</span><span data-l="uk">Зв’язний текст</span></td><td><span data-l="en">Makes a clear, connected text.</span><span data-l="uk">Робить чіткий, зв’язний текст.</span></td></tr>
+          <tr><td><kbd>3</kbd> <span data-l="en">Business</span><span data-l="uk">Діловий</span></td><td><span data-l="en">Makes a polite work message.</span><span data-l="uk">Робить ввічливе робоче повідомлення.</span></td></tr>
+          <tr><td><kbd>4</kbd> <span data-l="en">Messenger</span><span data-l="uk">Месенджер</span></td><td><span data-l="en">Makes a short chat message.</span><span data-l="uk">Робить коротке повідомлення для чату.</span></td></tr>
+          <tr><td><kbd>5</kbd> <span data-l="en">AI prompt</span><span data-l="uk">Промпт для ШІ</span></td><td><span data-l="en">Makes a request for an AI assistant.</span><span data-l="uk">Робить запит для ШІ-асистента.</span></td></tr>
+          <tr><td><kbd>6</kbd> <span data-l="en">Task list</span><span data-l="uk">Список завдань</span></td><td><span data-l="en">Makes a list of tasks.</span><span data-l="uk">Робить список завдань.</span></td></tr>
+        </table>
+      </div>
+      <p class="small">
+        <span data-l="en"><b>Cleanup</b> and <b>No edit</b> are built in. You cannot rename, remove or move them, and their instructions are fixed. You can change the Cleanup model. The other five modes are yours: they come with the app on digits <kbd>2</kbd>–<kbd>6</kbd>.</span>
+        <span data-l="uk"><b>Чистка</b> і <b>Без правки</b> вбудовані. Їх не можна перейменувати, видалити чи перемістити, а їхні інструкції незмінні. Модель Чистки можна змінити. Інші п’ять режимів — ваші: вони йдуть із застосунком на цифрах <kbd>2</kbd>–<kbd>6</kbd>.</span>
+      </p>
+      <p class="small">
+        <span data-l="en">Settings → <b>Modes</b> lists all modes with their digits. Drag a row of your own mode to move it; the digit follows the position. Select a row to edit its <b>Name</b>, <b>Model</b> and <b>Prompt</b>, or to test it on the last dictation. <b>Reset to default</b> gives a mode that comes with the app its name and prompt back. The <b>+</b> button adds a mode with a short base prompt; write what the mode must do after it. You can keep up to 8 own modes on digits <kbd>2</kbd>–<kbd>9</kbd>. The <b>−</b> button, the Delete key or <b>Delete mode</b> deletes the selected mode after a confirmation, with its prompt and AI model.</span>
+        <span data-l="uk">Налаштування → <b>Режими</b> показують усі режими з їхніми цифрами. Перетягніть рядок свого режиму, щоб пересунути його; цифра йде за позицією. Виберіть рядок, щоб змінити <b>Назву</b>, <b>Модель</b> і <b>Промпт</b> або перевірити режим на останній диктовці. <b>Скинути до типового</b> повертає режиму, що йде із застосунком, його назву і промпт. Кнопка <b>+</b> додає режим із коротким базовим промптом; допишіть після нього, що має робити режим. Можна мати до 8 власних режимів на цифрах <kbd>2</kbd>–<kbd>9</kbd>. Кнопка <b>−</b>, клавіша Delete або <b>Видалити режим</b> після підтвердження видаляє вибраний режим разом із промптом і моделлю ШІ.</span>
+      </p>
+      <p class="small">
+        <span data-l="en">With the <b>API key</b> service, the <b>Model</b> button of a mode opens a list. Type in <b>Search</b> to filter it. The <b>Recommended</b> models come first, then all listed models, the recommended ones included, in groups by the prefix before <code>/</code>. Ids without <code>/</code> sit in one group. <b>Other…</b> takes any model id. Each provider keeps its own choice for each mode.</span>
+        <span data-l="uk">Із сервісом <b>Ключ API</b> кнопка <b>Модель</b> режиму відкриває список. Введіть текст у <b>Пошук</b>, щоб відфільтрувати його. Спершу йдуть <b>Рекомендовані</b> моделі, потім усі моделі зі списку, разом із рекомендованими, у групах за префіксом перед <code>/</code>. Id без <code>/</code> стоять в одній групі. <b>Інша…</b> приймає будь-який id моделі. Кожен провайдер зберігає свій вибір для кожного режиму.</span>
+      </p>
+    </section>
+
+    <section>
+      <div class="stage-head"><h2><span data-l="en">What works without AI</span><span data-l="uk">Що працює без ШІ</span></h2></div>
+      <div class="box" style="overflow-x:auto">
+        <table>
+          <tr><td></td><td><b><span data-l="en">No AI service</span><span data-l="uk">Без сервісу ШІ</span></b></td><td><b><span data-l="en">AI service</span><span data-l="uk">Сервіс ШІ</span></b></td><td><b><span data-l="en">AI service and Jev</span><span data-l="uk">Сервіс ШІ і Jev</span></b></td></tr>
+          <tr><td><span data-l="en">Recognition and paste</span><span data-l="uk">Розпізнавання і вставка</span></td><td colspan="3"><span data-l="en">Work in all three cases.</span><span data-l="uk">Працюють в усіх трьох випадках.</span></td></tr>
+          <tr><td><kbd>0</kbd> <span data-l="en">No edit</span><span data-l="uk">Без правки</span></td><td colspan="3"><span data-l="en">Pastes the text as the app heard it, in all three cases.</span><span data-l="uk">Вставляє текст так, як його почув застосунок, в усіх трьох випадках.</span></td></tr>
+          <tr><td><kbd>1</kbd> <span data-l="en">Cleanup</span><span data-l="uk">Чистка</span></td>
+            <td><span data-l="en">Locked. A dictation pastes the text as heard, with no error.</span><span data-l="uk">Заблокована. Диктовка вставляє текст як почуто, без помилки.</span></td>
+            <td><span data-l="en">Edits every text.</span><span data-l="uk">Редагує кожен текст.</span></td>
+            <td><span data-l="en">Edits only texts whose error chance is at or above the threshold. Jev checks no other mode and no translation.</span><span data-l="uk">Редагує лише тексти, у яких ймовірність помилки на рівні порогу або вища. Jev не перевіряє інші режими й переклад.</span></td></tr>
+          <tr><td><kbd>2</kbd>–<kbd>9</kbd> <span data-l="en">Your own modes</span><span data-l="uk">Власні режими</span></td>
+            <td><span data-l="en">Locked.</span><span data-l="uk">Заблоковані.</span></td>
+            <td colspan="2"><span data-l="en">Rewrite the text in their style. Jev does not check them.</span><span data-l="uk">Переписують текст у своєму стилі. Jev їх не перевіряє.</span></td></tr>
+          <tr><td><span data-l="en">Language of the result</span><span data-l="uk">Мова результату</span></td>
+            <td><span data-l="en">Every language chip is locked. No translation.</span><span data-l="uk">Кожна кнопка мови заблокована. Перекладу немає.</span></td>
+            <td colspan="2"><span data-l="en">The edit writes the result in the selected language. An added language translates.</span><span data-l="uk">Правка пише результат вибраною мовою. Додана мова перекладає.</span></td></tr>
+          <tr><td><span data-l="en">Language of the speech</span><span data-l="uk">Мова мовлення</span></td><td colspan="3"><span data-l="en">Whisper: <b>Auto</b> or a language you pick, in all three cases. Parakeet: no choice.</span><span data-l="uk">Whisper: <b>Авто</b> або мова, яку ви вибрали, в усіх трьох випадках. Parakeet: вибору немає.</span></td></tr>
+        </table>
+      </div>
+      <p class="small">
+        <span data-l="en">An AI service counts as connected when its tool or key is there. <b>Claude Code</b> and <b>Codex</b>: the app finds the tool. <b>API key</b>: the provider has a key; <b>Local</b> needs only an address; <b>Custom URL</b> needs an address and a key. A failed edit or a failed <b>Check</b> marks the service as not working, with the reason, until an edit or a <b>Check</b> passes.</span>
+        <span data-l="uk">Сервіс ШІ вважається підключеним, коли є його інструмент або ключ. <b>Claude Code</b> і <b>Codex</b>: застосунок знаходить інструмент. <b>Ключ API</b>: у провайдера є ключ; <b>Локальний</b> потребує лише адреси; <b>Власна адреса</b> потребує адреси й ключа. Невдала правка або невдала <b>Перевірка</b> позначає сервіс як такий, що не працює, з причиною, доки правка або <b>Перевірка</b> не пройде.</span>
+      </p>
+      <p class="small">
+        <span data-l="en">Settings → <b>General</b> starts with <b>What works now</b>. <b>Speech recognition</b> shows the state of the speech model. <b>AI edit</b> shows <b>Works</b>, <b>Not connected</b> or <b>Not working: <i>reason</i></b>. <b>Jev</b> shows <b>Works</b> when the key of the selected source is stored, otherwise <b>Off: no key</b>. A <b>Connect…</b> button next to <b>AI edit</b> (unless it works) and next to <b>Jev</b> (without a key) opens the <b>Edit service</b> tab.</span>
+        <span data-l="uk">Налаштування → <b>Загальні</b> починаються з <b>Що працює зараз</b>. <b>Розпізнавання мовлення</b> показує стан моделі мовлення. <b>Правка ШІ</b> показує <b>Працює</b>, <b>Не підключена</b> або <b>Не працює: <i>причина</i></b>. <b>Jev</b> показує <b>Працює</b>, коли ключ вибраного джерела збережено, інакше <b>Вимкнено: немає ключа</b>. Кнопка <b>Підключити…</b> біля <b>Правка ШІ</b> (якщо вона не працює) і біля <b>Jev</b> (без ключа) відкриває вкладку <b>Редагування</b>.</span>
+      </p>
+    </section>
+
+    <section>
+      <div class="stage-head"><h2><span data-l="en">The menu bar icon</span><span data-l="uk">Іконка в рядку меню</span></h2></div>
+      <div class="box">
+        <table>
+          <tr><td><span data-l="en">Revert to original</span><span data-l="uk">Повернути оригінал</span></td><td><span data-l="en">Puts back the text before the last edit.</span><span data-l="uk">Повертає текст до останньої правки.</span></td></tr>
+          <tr><td><span data-l="en">AI edit is not connected</span><span data-l="uk">Правка ШІ не підключена</span></td><td><span data-l="en">A line under the state. It shows only when no AI service is connected.</span><span data-l="uk">Рядок під станом. З’являється, лише коли сервіс ШІ не підключено.</span></td></tr>
+          <tr><td><span data-l="en">Settings…</span><span data-l="uk">Налаштування…</span></td><td><span data-l="en">The AI service, the speech model, the languages, the hotkeys and the modes.</span><span data-l="uk">Сервіс ШІ, модель мовлення, мови, гарячі клавіші та режими.</span></td></tr>
+          <tr><td><span data-l="en">Export diagnostics…</span><span data-l="uk">Експортувати діагностику…</span></td><td>
+            <span data-l="en">Saves a JSON file, <code>MacDictation-diagnostics-<i>date</i>.json</code>, that you can send to the developer when something does not work. It holds the app and macOS versions, the models, the Cleanup error threshold, the language, which services are connected and the recent steps and errors of the app. It holds no dictated text, no key and no prompt.</span>
+            <span data-l="uk">Зберігає JSON-файл <code>MacDictation-diagnostics-<i>дата</i>.json</code>, який можна надіслати розробнику, коли щось не працює. У ньому версії застосунку й macOS, моделі, поріг помилки Чистки, мова, які сервіси підключено, а також останні кроки й помилки застосунку. У ньому немає продиктованого тексту, ключів і промптів.</span>
+          </td></tr>
+          <tr><td><span data-l="en">Quit MacDictation</span><span data-l="uk">Вийти з MacDictation</span></td><td><span data-l="en">Closes the app.</span><span data-l="uk">Закриває застосунок.</span></td></tr>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================== INSTALL ============================== -->
+  <div class="panel" id="install" role="tabpanel" aria-labelledby="tab-install" hidden>
+    <section>
+      <div class="stage-head"><span class="k"><span data-l="en">Part 1</span><span data-l="uk">Частина 1</span></span><h2><span data-l="en">Install the app</span><span data-l="uk">Встановіть застосунок</span></h2></div>
+      <ol class="steps">
+        <li class="step"><div class="body">
+          <span class="t"><span data-l="en">Put the app in Applications</span><span data-l="uk">Покладіть застосунок у Програми</span></span>
+          <ul>
+            <li><span data-l="en">Open <code>MacDictation.zip</code>. You get <code>MacDictation.app</code>.</span><span data-l="uk">Відкрийте <code>MacDictation.zip</code>. З’явиться <code>MacDictation.app</code>.</span></li>
+            <li><span data-l="en">Drag <code>MacDictation.app</code> into the <b>Applications</b> folder.</span><span data-l="uk">Перетягніть <code>MacDictation.app</code> у папку <b>Програми</b>.</span></li>
+            <li><span data-l="en">Open it from <b>Applications</b>.</span><span data-l="uk">Відкрийте його з <b>Програм</b>.</span></li>
+          </ul>
+          <p class="small"><span data-l="en">The app has no Dock icon. Look for the microphone icon in the menu bar, at the top right of the screen.</span><span data-l="uk">У застосунку немає іконки в Dock. Шукайте іконку мікрофона в рядку меню, угорі праворуч на екрані.</span></p>
+        </div></li>
+        <li class="step"><div class="body">
+          <span class="t"><span data-l="en">Wait for the speech model</span><span data-l="uk">Дочекайтеся моделі мовлення</span></span>
+          <p><span data-l="en">On the first launch, the app downloads its speech model. The menu of the icon shows the progress. Keep the Mac online until it ends.</span><span data-l="uk">Під час першого запуску застосунок завантажує модель мовлення. Меню іконки показує прогрес. Не відключайте Mac від інтернету, доки завантаження не закінчиться.</span></p>
+          <p class="small"><span data-l="en">Another speech model in Settings → <b>General</b> → <b>Speech recognition</b> downloads when you first select it. The first launch also turns on <b>Open at login</b>; turn it off in Settings → <b>General</b>.</span><span data-l="uk">Інша модель у Налаштуваннях → <b>Загальні</b> → <b>Розпізнавання мовлення</b> завантажується, коли ви вперше її виберете. Перший запуск також вмикає <b>Відкривати під час входу</b>; вимкніть це в Налаштуваннях → <b>Загальні</b>.</span></p>
+        </div></li>
+      </ol>
+      <p class="callout"><span data-l="en"><b>You need:</b> a Mac with Apple silicon (M1 or later) and macOS 15 or later.</span><span data-l="uk"><b>Потрібно:</b> Mac з Apple silicon (M1 або новіший) і macOS 15 або новіша.</span></p>
+    </section>
+
+    <section>
+      <div class="stage-head"><span class="k"><span data-l="en">Part 2</span><span data-l="uk">Частина 2</span></span><h2><span data-l="en">Give the permissions</span><span data-l="uk">Надайте дозволи</span></h2></div>
+      <ol class="steps">
+        <li class="step"><div class="body">
+          <span class="t"><span data-l="en">Microphone</span><span data-l="uk">Мікрофон</span></span>
+          <p><span data-l="en">macOS asks on your first recording. Click <b>Allow</b>.</span><span data-l="uk">macOS запитає під час першого запису. Натисніть <b>Дозволити</b>.</span></p>
+        </div></li>
+        <li class="step"><div class="body">
+          <span class="t"><span data-l="en">Accessibility</span><span data-l="uk">Універсальний доступ</span></span>
+          <p><span data-l="en">The app needs it to paste the text. macOS asks on the first paste.</span><span data-l="uk">Він потрібен застосунку, щоб вставляти текст. macOS запитає під час першої вставки.</span></p>
+          <ul>
+            <li><span data-l="en">Open <b>System Settings → Privacy &amp; Security → Accessibility</b>.</span><span data-l="uk">Відкрийте <b>Системні параметри → Приватність і безпека → Універсальний доступ</b>.</span></li>
+            <li><span data-l="en">Turn on <b>MacDictation</b>.</span><span data-l="uk">Увімкніть <b>MacDictation</b>.</span></li>
+          </ul>
+          <p class="small"><span data-l="en">Without this permission, the text stays in the clipboard. Press <kbd>⌘V</kbd> to paste it yourself.</span><span data-l="uk">Без цього дозволу текст залишається в буфері обміну. Натисніть <kbd>⌘V</kbd>, щоб вставити його самостійно.</span></p>
+        </div></li>
+        <li class="step"><div class="body">
+          <span class="t"><span data-l="en">Free the <kbd>⌃Space</kbd> shortcut</span><span data-l="uk">Звільніть комбінацію <kbd>⌃Space</kbd></span></span>
+          <p><span data-l="en">macOS uses <kbd>⌃Space</kbd> to change the keyboard layout. MacDictation uses it to open its window.</span><span data-l="uk">macOS використовує <kbd>⌃Space</kbd>, щоб змінювати розкладку. MacDictation відкриває нею своє вікно.</span></p>
+          <ul>
+            <li><span data-l="en">Open <b>System Settings → Keyboard → Keyboard Shortcuts… → Input Sources</b>.</span><span data-l="uk">Відкрийте <b>Системні параметри → Клавіатура → Клавіатурні скорочення… → Джерела вводу</b>.</span></li>
+            <li><span data-l="en">Turn off <b>Select the previous input source</b>.</span><span data-l="uk">Вимкніть <b>Вибрати попереднє джерело вводу</b>.</span></li>
+          </ul>
+          <p class="small"><span data-l="en">Or keep it, and choose other keys in MacDictation <b>Settings → General → Hotkeys</b>.</span><span data-l="uk">Або залиште її і виберіть інші клавіші в MacDictation: <b>Налаштування → Загальні → Гарячі клавіші</b>.</span></p>
+        </div></li>
+      </ol>
+    </section>
+
+    <section>
+      <div class="stage-head"><span class="k"><span data-l="en">Part 3</span><span data-l="uk">Частина 3</span></span><h2><span data-l="en">Connect an AI service</span><span data-l="uk">Підключіть сервіс ШІ</span></h2></div>
+      <p class="sub"><span data-l="en">The AI service edits the text in Cleanup and your own modes. Choose <b>one</b> service. Without a service, the app pastes the text as it heard it.</span><span data-l="uk">Сервіс ШІ редагує текст у Чистці та ваших власних режимах. Виберіть <b>один</b> сервіс. Без сервісу застосунок вставляє текст так, як його почув.</span></p>
+      <div class="cards">
+        <div class="box card">
+          <span class="tag">Claude Code</span>
+          <p class="small"><span data-l="en">For a Claude subscription.</span><span data-l="uk">Для підписки Claude.</span></p>
+          <ol>
+            <li><span data-l="en">Open <b>Terminal</b> and run:</span><span data-l="uk">Відкрийте <b>Термінал</b> і виконайте:</span>
+              <div class="cmd"><code>curl -fsSL https://claude.ai/install.sh | bash</code><button class="copy" type="button">Copy</button></div>
+            </li>
+            <li><span data-l="en">Run <code>claude</code> once and sign in.</span><span data-l="uk">Один раз запустіть <code>claude</code> і увійдіть в обліковий запис.</span></li>
+          </ol>
+        </div>
+        <div class="box card">
+          <span class="tag">Codex</span>
+          <p class="small"><span data-l="en">For a ChatGPT subscription.</span><span data-l="uk">Для підписки ChatGPT.</span></p>
+          <ol>
+            <li><span data-l="en">Open <b>Terminal</b> and run:</span><span data-l="uk">Відкрийте <b>Термінал</b> і виконайте:</span>
+              <div class="cmd"><code>brew install --cask codex</code><button class="copy" type="button">Copy</button></div>
+            </li>
+            <li><span data-l="en">Run <code>codex</code> once and sign in with ChatGPT.</span><span data-l="uk">Один раз запустіть <code>codex</code> і увійдіть через ChatGPT.</span></li>
+          </ol>
+          <p class="small"><span data-l="en">The command needs <a href="https://brew.sh" target="_blank" rel="noopener">Homebrew</a>. Other ways to install: <a href="https://developers.openai.com/codex/cli" target="_blank" rel="noopener">Codex CLI page</a>.</span><span data-l="uk">Команді потрібен <a href="https://brew.sh" target="_blank" rel="noopener">Homebrew</a>. Інші способи встановлення: <a href="https://developers.openai.com/codex/cli" target="_blank" rel="noopener">сторінка Codex CLI</a>.</span></p>
+        </div>
+        <div class="box card">
+          <span class="tag ok"><span data-l="en">API key · no subscription</span><span data-l="uk">Ключ API · без підписки</span></span>
+          <p class="small"><span data-l="en">You pay the provider a little for each request. Providers: OpenRouter, OpenAI, Anthropic, Gemini, Groq, Mistral, DeepSeek, xAI, a local server, or any address that speaks the same protocol.</span><span data-l="uk">Ви трохи платите провайдеру за кожен запит. Провайдери: OpenRouter, OpenAI, Anthropic, Gemini, Groq, Mistral, DeepSeek, xAI, локальний сервер або будь-яка адреса з тим самим протоколом.</span></p>
+          <ol>
+            <li><span data-l="en">Make an account at your provider and add credit. OpenRouter is the easiest: <a href="https://openrouter.ai" target="_blank" rel="noopener">openrouter.ai</a>.</span><span data-l="uk">Створіть обліковий запис у провайдера і поповніть баланс. Найпростіше з OpenRouter: <a href="https://openrouter.ai" target="_blank" rel="noopener">openrouter.ai</a>.</span></li>
+            <li><span data-l="en">Make a key in the console of the provider. For OpenRouter: <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>.</span><span data-l="uk">Створіть ключ у консолі провайдера. Для OpenRouter: <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>.</span></li>
+            <li><span data-l="en">Paste the key in the app, in step 2 below.</span><span data-l="uk">Вставте ключ у застосунок на кроці 2 нижче.</span></li>
+          </ol>
+          <p class="small"><span data-l="en">The Jev check runs with the key of its selected source, see Part 4.</span><span data-l="uk">Перевірка Jev працює з ключем свого вибраного джерела, див. частину 4.</span></p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li class="step"><div class="body">
+          <span class="t"><span data-l="en">Open the app settings</span><span data-l="uk">Відкрийте налаштування застосунку</span></span>
+          <p><span data-l="en">Click the microphone icon in the menu bar, then <b>Settings…</b>. Open the <b>Edit service</b> tab.</span><span data-l="uk">Клацніть іконку мікрофона в рядку меню, потім <b>Налаштування…</b>. Відкрийте вкладку <b>Редагування</b>.</span></p>
+        </div></li>
+        <li class="step"><div class="body">
+          <span class="t"><span data-l="en">Select your service</span><span data-l="uk">Виберіть свій сервіс</span></span>
+          <ul>
+            <li><span data-l="en">In <b>Service</b>, select <b>Claude Code</b>, <b>Codex</b> or <b>API key</b>.</span><span data-l="uk">У полі <b>Сервіс</b> виберіть <b>Claude Code</b>, <b>Codex</b> або <b>Ключ API</b>.</span></li>
+            <li><span data-l="en">The <b>Modes</b> tab sets the AI model of Cleanup and of each own mode. The defaults work; change them only if you want.</span><span data-l="uk">Вкладка <b>Режими</b> задає модель ШІ для Чистки і кожного власного режиму. Типові моделі працюють; змінюйте їх, лише якщо хочете.</span></li>
+            <li><span data-l="en">API key: paste the key into <b>API key</b>. The app selects the <b>Provider</b> from the start of the key when that start is unique. Otherwise, select the <b>Provider</b> yourself. Click <b>Save</b>. The app keeps the key in the macOS Keychain. If macOS asks for Keychain access to the key, click <b>Always Allow</b>. A key of another format than the selected provider (<code>sk-or-</code> for OpenRouter, <code>sk-ant-</code> for Anthropic) shows an error, and the app keeps the stored key.</span><span data-l="uk">Ключ API: вставте ключ у поле <b>Ключ API</b>. Застосунок вибирає <b>Провайдера</b> за початком ключа, коли цей початок однозначний. Інакше виберіть <b>Провайдера</b> самі. Натисніть <b>Зберегти</b>. Застосунок зберігає ключ у Keychain macOS. Якщо macOS просить доступ до ключа в Keychain, натисніть <b>Завжди дозволяти</b>. Ключ іншого формату, ніж у вибраного провайдера (<code>sk-or-</code> для OpenRouter, <code>sk-ant-</code> для Anthropic), показує помилку, і застосунок залишає збережений ключ.</span></li>
+            <li><span data-l="en">The line under the key shows <b>The key is stored in the Keychain.</b> or <b>No key is stored.</b> <b>Remove</b> deletes the key after a confirmation.</span><span data-l="uk">Рядок під ключем показує <b>Ключ збережено в Keychain.</b> або <b>Ключ не збережено.</b> <b>Видалити</b> видаляє ключ після підтвердження.</span></li>
+            <li><span data-l="en">The app then lists the models of the provider. <b>Key works · models: N</b> means the key is good. <b>Local</b> shows <b>Server answers · models: N</b>. Click <b>Refresh</b> to list them again.</span><span data-l="uk">Потім застосунок показує моделі провайдера. <b>Ключ працює · моделей: N</b> означає, що ключ добрий. <b>Локальний</b> показує <b>Сервер відповідає · моделей: N</b>. Натисніть <b>Оновити</b>, щоб отримати список знову.</span></li>
+            <li><span data-l="en"><b>Local (Ollama / LM Studio)</b> needs no key. Start the server, then click <b>Refresh</b>. The <b>Address</b> field saves as you type. It starts as <code>http://localhost:11434/v1</code> (Ollama). For LM Studio, enter its address. <b>Custom URL</b> needs an <b>Address</b> and a key.</span><span data-l="uk"><b>Локальний (Ollama / LM Studio)</b> не потребує ключа. Запустіть сервер, потім натисніть <b>Оновити</b>. Поле <b>Адреса</b> зберігається під час введення. Спочатку там <code>http://localhost:11434/v1</code> (Ollama). Для LM Studio введіть його адресу. <b>Власна адреса</b> потребує <b>Адреси</b> і ключа.</span></li>
+          </ul>
+          <p class="small"><span data-l="en">For Claude Code and Codex, the <b>Tool</b> row shows where the app found the tool. "not found" means the app found no tool in its folders: <code>~/.local/bin</code>, <code>/opt/homebrew/bin</code>, <code>/usr/local/bin</code>, <code>~/.claude/local</code>, <code>~/.npm-global/bin</code>, <code>~/.bun/bin</code>, <code>~/.volta/bin</code>, <code>~/.asdf/shims</code>, <code>~/.local/share/mise/shims</code> and the <code>bin</code> folder of each <code>~/.nvm/versions/node</code> version. The row then shows the install command and the sign-in step.</span><span data-l="uk">Для Claude Code і Codex рядок <b>Інструмент</b> показує, де застосунок знайшов інструмент. «не знайдено» означає, що застосунок не знайшов інструмент у своїх папках: <code>~/.local/bin</code>, <code>/opt/homebrew/bin</code>, <code>/usr/local/bin</code>, <code>~/.claude/local</code>, <code>~/.npm-global/bin</code>, <code>~/.bun/bin</code>, <code>~/.volta/bin</code>, <code>~/.asdf/shims</code>, <code>~/.local/share/mise/shims</code> і папка <code>bin</code> кожної версії в <code>~/.nvm/versions/node</code>. Тоді рядок показує команду встановлення і крок входу.</span></p>
+        </div></li>
+        <li class="step"><div class="body">
+          <span class="t"><span data-l="en">Click Check</span><span data-l="uk">Натисніть «Перевірити»</span></span>
+          <p><span data-l="en">The app edits a sample text. The <b>Model</b> row shows <b>Works</b> with the edited text, or <b>Failed</b> with the reason. <b>Works</b> means the setup is done.</span><span data-l="uk">Застосунок редагує зразок тексту. Рядок <b>Модель</b> показує <b>Працює</b> з відредагованим текстом або <b>Не вдалося</b> з причиною. <b>Працює</b> означає, що налаштування завершено.</span></p>
+        </div></li>
+      </ol>
+      <p class="callout"><span data-l="en"><b>When something does not work,</b> choose <b>Export diagnostics…</b> in the menu of the microphone icon or in Settings → <b>General</b>, and send the saved file to the developer. The app keeps its diagnostic log in <code>~/Library/Application Support/com.valeriinovykov.MacDictation/Diagnostics</code>, one file per day. The log holds no dictated text and no key. <b>Settings → General → Keep dictation and diagnostic logs</b> sets how many days it stays.</span><span data-l="uk"><b>Коли щось не працює,</b> виберіть <b>Експортувати діагностику…</b> в меню іконки мікрофона або в Налаштуваннях → <b>Загальні</b> і надішліть збережений файл розробнику. Застосунок зберігає журнал діагностики в <code>~/Library/Application Support/com.valeriinovykov.MacDictation/Diagnostics</code>, один файл на день. У журналі немає продиктованого тексту і ключів. <b>Налаштування → Загальні → Зберігати журнали диктовок і діагностики</b> задає, скільки днів він зберігається.</span></p>
+      <p class="callout warn"><span data-l="en"><b>Keep the key private.</b> Paste it only into the app settings. Do not send it in a chat or an email.</span><span data-l="uk"><b>Не показуйте ключ нікому.</b> Вставляйте його лише в налаштування застосунку. Не надсилайте його в чаті чи листі.</span></p>
+    </section>
+
+    <section>
+      <div class="stage-head"><span class="k"><span data-l="en">Part 4</span><span data-l="uk">Частина 4</span></span><h2><span data-l="en">The Jev check: faster Cleanup</span><span data-l="uk">Перевірка Jev: швидша Чистка</span></h2><span class="tag app"><span data-l="en">needs a key for the source</span><span data-l="uk">потрібен ключ джерела</span></span></div>
+      <div class="box">
+        <p><span data-l="en">Jev is a small, fast model. It does not edit the text. It only tells how likely the text has recognition errors. Set it up in Settings → <b>Edit service</b> → <b>Cleanup check</b>.</span><span data-l="uk">Jev — невелика швидка модель. Вона не редагує текст. Вона лише оцінює, наскільки ймовірно, що в тексті є помилки розпізнавання. Налаштуйте її в Налаштуваннях → <b>Редагування</b> → <b>Перевірка чистки</b>.</span></p>
+        <table>
+          <tr><td><span data-l="en">Where it works</span><span data-l="uk">Де працює</span></td><td><span data-l="en">Only in mode <b>1 Cleanup</b>, which also includes the quick dictation with <kbd>⌃⇧Space</kbd>. Your own modes always rewrite the text, so they skip the check.</span><span data-l="uk">Лише в режимі <b>1 Чистка</b>, зокрема у швидкій диктовці з <kbd>⌃⇧Space</kbd>. Власні режими завжди переписують текст, тому пропускають перевірку.</span></td></tr>
+          <tr><td><span data-l="en">Chance at or above the threshold</span><span data-l="uk">Ймовірність на рівні порогу або вища</span></td><td><span data-l="en">The text goes to the AI edit.</span><span data-l="uk">Текст іде на правку ШІ.</span></td></tr>
+          <tr><td><span data-l="en">Chance below the threshold</span><span data-l="uk">Ймовірність нижча за поріг</span></td><td><span data-l="en">The app pastes the text at once. You do not wait for the edit, and the edit costs nothing.</span><span data-l="uk">Застосунок одразу вставляє текст. Ви не чекаєте на правку, і правка нічого не коштує.</span></td></tr>
+          <tr><td><span data-l="en">No answer within 2 s</span><span data-l="uk">Немає відповіді за 2 с</span></td><td><span data-l="en">The app pastes the text as it heard it.</span><span data-l="uk">Застосунок вставляє текст так, як його почув.</span></td></tr>
+          <tr><td><span data-l="en">Text in another language</span><span data-l="uk">Текст іншою мовою</span></td><td><span data-l="en">The app skips the check and always edits, so the result comes in the selected language.</span><span data-l="uk">Застосунок пропускає перевірку і завжди редагує, тож результат буде вибраною мовою.</span></td></tr>
+          <tr><td><span data-l="en">No key for the selected source</span><span data-l="uk">Немає ключа для вибраного джерела</span></td><td><span data-l="en">No check. Cleanup sends every text to the AI edit.</span><span data-l="uk">Перевірки немає. Чистка надсилає кожен текст на правку ШІ.</span></td></tr>
+        </table>
+      </div>
+      <ul class="small">
+        <li><span data-l="en">In <b>Source</b>, select <b>TypeSafe</b> or <b>OpenRouter</b>.</span><span data-l="uk">У полі <b>Джерело</b> виберіть <b>TypeSafe</b> або <b>OpenRouter</b>.</span></li>
+        <li><span data-l="en"><b>TypeSafe</b>: paste the key into <b>TypeSafe key</b> and click <b>Save</b>. <b>Get a key</b> opens the TypeSafe console. The app keeps the key in the Keychain.</span><span data-l="uk"><b>TypeSafe</b>: вставте ключ у поле <b>Ключ TypeSafe</b> і натисніть <b>Зберегти</b>. <b>Отримати ключ</b> відкриває консоль TypeSafe. Застосунок зберігає ключ у Keychain.</span></li>
+        <li><span data-l="en"><b>OpenRouter</b>: the check uses the OpenRouter key. With no OpenRouter key, the section shows its own <b>API key</b> field for an OpenRouter key, unless the <b>API key</b> field above already takes an OpenRouter key.</span><span data-l="uk"><b>OpenRouter</b>: перевірка використовує ключ OpenRouter. Якщо ключа OpenRouter немає, розділ показує власне поле <b>Ключ API</b> для ключа OpenRouter, хіба що поле <b>Ключ API</b> вище вже приймає ключ OpenRouter.</span></li>
+        <li><span data-l="en">The app selects the source once, when the first of the two keys appears: <b>OpenRouter</b> for an OpenRouter key, otherwise <b>TypeSafe</b>. Until then, <b>Source</b> shows <b>TypeSafe</b>, and the first key decides, unless you select a source yourself first. A key added later does not change it; change it in <b>Source</b>. The check runs only with the key of the selected source.</span><span data-l="uk">Застосунок вибирає джерело один раз, коли з’являється перший із двох ключів: <b>OpenRouter</b> для ключа OpenRouter, інакше <b>TypeSafe</b>. Доти <b>Джерело</b> показує <b>TypeSafe</b>, і вирішує перший ключ, якщо ви раніше не вибрали джерело самі. Ключ, доданий пізніше, вибір не змінює; змініть його в полі <b>Джерело</b>. Перевірка працює лише з ключем вибраного джерела.</span></li>
+        <li><span data-l="en">The <b>Error threshold</b> is 0.40 (40%) by default. Move the slider to change it. A lower threshold edits more texts.</span><span data-l="uk"><b>Поріг помилки</b> типово 0,40 (40%). Пересуньте повзунок, щоб змінити його. Нижчий поріг редагує більше текстів.</span></li>
+        <li><span data-l="en">The check works with any edit service. For example: Claude Code edits, and the TypeSafe key runs only Jev, with the source <b>TypeSafe</b>.</span><span data-l="uk">Перевірка працює з будь-яким сервісом правки. Наприклад: редагує Claude Code, а ключ TypeSafe потрібен лише для Jev, з джерелом <b>TypeSafe</b>.</span></li>
+        <li><span data-l="en"><b>Check</b> also tests Jev. The <b>Cleanup check</b> row shows its error chance for a sample text, <b>Off</b> without a key, or <b>No answer</b>. The two rows run at the same time, each with its own status.</span><span data-l="uk"><b>Перевірити</b> також тестує Jev. Рядок <b>Перевірка чистки</b> показує ймовірність помилки для зразка тексту, <b>Вимкнено</b> без ключа або <b>Немає відповіді</b>. Обидва рядки перевіряються одночасно, кожен зі своїм статусом.</span></li>
+      </ul>
+    </section>
+  </div>
+</div>
+<script>
+(() => {
+  const labels = {
+    en: { copy: 'Copy', copied: 'Copied', selected: 'Selected: press ⌘C' },
+    uk: { copy: 'Копіювати', copied: 'Скопійовано', selected: 'Виділено: натисніть ⌘C' },
+  };
+  const tabs = [...document.querySelectorAll('.tabs [role="tab"]')];
+  const copyButtons = [...document.querySelectorAll('button.copy')];
+  const langButtons = [...document.querySelectorAll('[data-set-lang]')];
+  const currentLang = () => document.documentElement.lang === 'uk' ? 'uk' : 'en';
+
+  const setLang = lang => {
+    document.documentElement.lang = lang;
+    langButtons.forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.setLang === lang)));
+    copyButtons.forEach(btn => { btn.textContent = labels[lang].copy; });
+    try { localStorage.setItem('md-docs-lang', lang); } catch (e) {}
+  };
+  langButtons.forEach(btn => btn.addEventListener('click', () => setLang(btn.dataset.setLang)));
+
+  const select = tab => {
+    tabs.forEach(other => {
+      const isOn = other === tab;
+      other.setAttribute('aria-selected', String(isOn));
+      other.tabIndex = isOn ? 0 : -1;
+      document.getElementById(other.getAttribute('aria-controls')).hidden = !isOn;
+    });
+    try { history.replaceState(null, '', '#' + tab.getAttribute('aria-controls')); } catch (e) {}
+  };
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => select(tab));
+    tab.addEventListener('keydown', event => {
+      const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+      if (!step) { return; }
+      const next = tabs[(index + step + tabs.length) % tabs.length];
+      select(next);
+      next.focus();
+    });
+  });
+
+  copyButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const source = btn.closest('.cmd').querySelector('code');
+      const done = key => {
+        btn.textContent = labels[currentLang()][key];
+        setTimeout(() => { btn.textContent = labels[currentLang()].copy; }, 1600);
+      };
+      const selectText = () => {
+        const range = document.createRange();
+        range.selectNodeContents(source);
+        const selection = getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        done('selected');
+      };
+      try { navigator.clipboard.writeText(source.textContent).then(() => done('copied'), selectText); } catch (e) { selectText(); }
+    });
+  });
+
+  let savedLang = 'en';
+  try { savedLang = localStorage.getItem('md-docs-lang') === 'uk' ? 'uk' : 'en'; } catch (e) {}
+  setLang(savedLang);
+
+  const selectFromHash = () => {
+    const tab = tabs.find(item => '#' + item.getAttribute('aria-controls') === location.hash);
+    if (tab) { select(tab); }
+  };
+  window.addEventListener('hashchange', selectFromHash);
+  selectFromHash();
+})();
+</script>
+</body>
+</html>
